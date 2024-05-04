@@ -16,17 +16,12 @@ function boolValueToString(bool){
 
    //Ex2.2 - One and Zero - Binary
 
-   const binaryArray = [1, 0, 0, 1]; 
+   const binaryArray = [1, 1, 0, 0]; 
 
-   function binaryToInteger(array) {                      //? FIND A BETTER WAY
+   function binaryToInteger(array) {                      
       array.reverse();
-      let power = 1;
-      let binarySum = 0;
-      for (const index of array) {
-         binarySum += (index * power);
-         power *= 2;
-      }
-      return binarySum;
+      const sum = array.reduce((sum,binaryDigit,index) => sum + binaryDigit * Math.pow(2,index));
+      return sum;
    }
    console.log(`2.2 Binary to Integer:`,binaryToInteger(binaryArray));
 
@@ -34,7 +29,7 @@ function boolValueToString(bool){
 
    const perfectSquare = 625;
  
-   function findNextPerfectSqr(number) {                    //? DO REFACTORING
+   function findNextPerfectSqr(number) {                    
       numberRoot = Math.round(Math.sqrt(number));     
       if (number === numberRoot*numberRoot) {
          numberRoot++ 
@@ -278,3 +273,79 @@ function longestWord(stringArray) {
 
 console.log(`5.8 Shortest Word Version 2:`,longestWord(stringOfWords));
 
+// Ex6.1 - Mumbling
+
+const accumString = `RqaEzty`;
+
+function stringMumbling(string) {
+    string = string.toUpperCase().split(``);
+   
+   for (let i = 0; i < string.length; i++) {
+      string[i] = string[i]+string[i].repeat(i).toLowerCase();
+   }
+   return string.join(`-`);
+}
+
+console.log(`6.1 Mumbling:`,stringMumbling(accumString));
+
+// Ex6.2 - Counting Duplicates
+
+const stringToCount = "Pseudopseudohypoparathyroidism";
+
+function countRepetitiveChars(string) {
+   const obj = {};
+
+   string.split(``).forEach((letter)=>{
+      obj[letter] = obj[letter] ? ++obj[letter] :  1;
+   } )
+   for (const letter in obj) {
+      if (obj[letter]<=1) {
+         delete obj[letter];
+      }
+   }
+   return obj;
+}
+
+console.log(`6.2 Counting Duplicates`,countRepetitiveChars(stringToCount));
+
+// Ex6.3 - organize strings
+
+const string1 =`xyaabbbccccdefww`;
+const string2 = `xxxxyyyyabklmopq`;
+
+function organizeStrings(s1, s2) {
+   let combinedString = (s1.concat(s2)).toLowerCase();
+   combinedString = combinedString.split(``).filter((letter,index)=>combinedString.indexOf(letter)=== index);
+   return combinedString.sort().join(``);
+}
+
+console.log(`6.3 Organize Strings:`,organizeStrings(string1,string2));
+
+//Ex6.4 - isogram
+
+const isogramString = `Uncopyrightables`;
+
+function checkIsogram(string) {
+   let isIsogram = true;
+
+   string = string.toLowerCase();
+   string = string.split(``).forEach((letter,index) =>{
+      if (string.indexOf(letter) !== index) {
+         isIsogram = false;
+      }
+   })
+   return isIsogram; 
+}
+
+console.log(`6.4 Isogram`,checkIsogram(isogramString));
+
+// Ex 8 - Find the Perimeter of a Rectangle
+
+const width = 2;
+const length = 9;
+
+function rectanglePerimeter(w,l) {
+   return 2*(w+l)
+}
+
+console.log(`8 Perimeter of Rectangle:`,rectanglePerimeter(width,length));
