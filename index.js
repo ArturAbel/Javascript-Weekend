@@ -14,6 +14,20 @@ function boolValueToString(bool){
    }
    console.log(`2.1 Lowest Two:`,sumOfTwoLowest(twoLowestArray));
 
+// CR- Incorrect sorting of the global variable, potential side effects.
+// Using slice() (or spread) before sorting prevents modifying the original array.
+function sumOfTwoLowest(array) {
+	const sortedArray = array.slice().sort((a, b) => a - b);
+	return sortedArray[0] + sortedArray[1];
+}
+
+// CR - with spread
+function sumTwoSmallestNumbers(numbers) {
+	const result = [...numbers];
+	result.sort((a, b) => a - b);
+	return result[0] + result[1];
+}
+
    //Ex2.2 - One and Zero - Binary
 
    const binaryArray = [1, 1, 0, 0]; 
@@ -29,7 +43,9 @@ function boolValueToString(bool){
 
    const perfectSquare = 625;
  
-   function findNextPerfectSqr(number) {                    
+   function findNextPerfectSqr(number) {       
+   // CR - Incorrect: It should use `Math.floor()` for precise integer check.
+   // `Math.round()` may incorrectly round close non-integer roots.
       numberRoot = Math.round(Math.sqrt(number));     
       if (number === numberRoot*numberRoot) {
          numberRoot++ 
@@ -44,6 +60,7 @@ function boolValueToString(bool){
 
    const findUniqArray = [ 1, 1, 1, 2, 1, 1, 1, 1, 1,];
 
+// CR - Inefficient sorting for finding unique value.
    function findUniq(array) {
       if (array.length < 3) {
          console.log(`Array is too small`);
@@ -54,6 +71,11 @@ function boolValueToString(bool){
       return UniqueNumber;
    }
 console.log(`2.4 Unique:`,findUniq(findUniqArray));
+
+// CR- Could use a more direct comparison approach
+function findUniq(arr) {
+	return arr.find((n) => arr.indexOf(n) === arr.lastIndexOf(n));
+}
 
 // Ex2.5 - Summation
 
@@ -91,10 +113,30 @@ function calculator(value1, char, value2) {
       return undefined;
    }
    else{
+      // CR - use of eval() is dangerous and should be avoided.      
       return eval(String(value1+char+value2));
    }
 }
 console.log(`2.7 Calculator = `,calculator(number1,operator,number2));
+
+// CR - Refactor to use a switch statement or a series of if/else for safety.
+function calculator(value1, char, value2) {
+	if (char === '/' && value2 === 0) {
+		throw new Error('Cannot divide by zero');
+	}
+	switch (char) {
+		case '+':
+			return value1 + value2;
+		case '-':
+			return value1 - value2;
+		case '*':
+			return value1 * value2;
+		case '/':
+			return value1 / value2;
+		default:
+			throw new Error('Invalid operator');
+	}
+}
 
 //Ex3.1 - Growth Of population
 
@@ -120,7 +162,8 @@ console.log(`3.1 Years to Population:`,yearsToPopulation(populationLimit,startin
 // Ex3.2 - People on the Bus
 
 const bus = [[5,0],[4,2],[5,4],[3,8]];
-
+// CR - Bus can start with passengers leaving the bus.
+// It's not logical to assume first second value must be zero.
 function peopleOnBus(array) {
    if (array[0][1] !== 0) {
    console.log(`Bus can't be already full.`);
@@ -133,6 +176,15 @@ function peopleOnBus(array) {
 }
 
 console.log(`3.2 People on Bus:`,peopleOnBus(bus));
+
+// CR - the right solution
+function peopleOnTheBus(array) {
+	let totalPeople = 0;
+	for (let i = 0; i < array.length; i++) {
+		totalPeople += array[i][0] - array[i][1];
+	}
+	return totalPeople;
+}
 
 // Ex4.1 - fibonacci -
 
@@ -187,7 +239,8 @@ console.log(`5.2 String Repeat:`,stringRepeater(stringToRepeat,repeatStringNumbe
 // Ex5.3 - To Camel Case
 
 const toCamelCase = `the-stealth-warrior`;
-
+// CR - does not handle underscores and keeps them in the string.
+// Should replace or remove dash/underscore and capitalize next letter.
 function convertToCamelCase(string) {
    string = string.split(``);
    
@@ -201,11 +254,23 @@ function convertToCamelCase(string) {
 }
 console.log(`5.3 To Camel Case:`,convertToCamelCase(toCamelCase));
 
+// CR - right solution
+function toCamelCase(str) {
+	const words = str.split(/-|_/);
+	return words
+		.map((word, index) => {
+			if (index == 0) return word;
+			return word[0].toUpperCase() + word.slice(1);
+		})
+		.join('');
+}
+
 //Ex5.4 - To Weird Case
 
 
 const toWeirdCase = `Weird string case`;
-
+// CR - The logic changes every letter rather than each word's characters.
+// Needs to split by words and apply transformation to each word individually.
 function convertToWeirdCase(string) {
    string = string.split(``);
    string = string.map((letter, index) => index % 2 === 0 ? letter.toUpperCase() : letter.toLowerCase());
@@ -213,10 +278,26 @@ function convertToWeirdCase(string) {
 }
 console.log(`5.4 To Weird Case:`,convertToWeirdCase(toWeirdCase));
 
+// CR - right solution
+function toWeirdCase(string) {
+	return string
+		.split(' ')
+		.map(function (word) {
+			return word
+				.split('')
+				.map(function (letter, index) {
+					return index % 2 == 0 ? letter.toUpperCase() : letter.toLowerCase();
+				})
+				.join('');
+		})
+		.join(' ');
+}
+
 //Ex5.5 - Abbreviate two words
 
 const toInitials = `Artur Abel`;
-
+// CR - Incorrect type checking and the method used; should compare typeof string !== 'string'.
+// Incorrect implementation for padding, could result in wrong output.
 function convertToInitials(string) {
    emptyString = [];
    string = string.split(` `);
@@ -226,6 +307,14 @@ function convertToInitials(string) {
    return emptyString.join(`.`);
 }
 console.log(`5.5 Abbreviate two words:`,convertToInitials(toInitials));
+
+// CR - right solution
+function abbrevName(name) {
+	return name
+		.split(' ')
+		.map((x) => x[0].toUpperCase())
+		.join('.');
+}
 
 //Ex5.6 - Mask
 
@@ -325,6 +414,9 @@ console.log(`6.3 Organize Strings:`,organizeStrings(string1,string2));
 
 const isogramString = `Uncopyrightables`;
 
+// CR - The string.split(``) part is incorrect. It should be string.split('') (with single quotes).
+// The forEach loop doesn't do anything with the returned value from the callback function. It should be using a different array method like some or every.
+// The string.indexOf(letter) !== index condition is not correct for checking if a letter is repeated. It will only catch the first occurrence of a repeated letter.
 function checkIsogram(string) {
    let isIsogram = true;
 
@@ -338,6 +430,31 @@ function checkIsogram(string) {
 }
 
 console.log(`6.4 Isogram`,checkIsogram(isogramString));
+
+// CR - right solutions
+function isIsogram(str){
+  str = str.toLowerCase();
+  let counts = {};
+  for(let char of str){
+      if(counts[char]){
+          return false;
+      }
+      counts[char] = 1;
+  }
+  return true;
+}
+
+function checkIsIsogram(string) {
+  const lowercaseString = string.toLowerCase();
+  const charSet = new Set();
+  return [...lowercaseString].every(char => {
+    if (charSet.has(char)) {
+      return false;
+    }
+    charSet.add(char);
+    return true;
+  });
+}
 
 // Ex 8 - Find the Perimeter of a Rectangle
 
